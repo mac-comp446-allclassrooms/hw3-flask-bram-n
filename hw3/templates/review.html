@@ -1,0 +1,66 @@
+<!-- Star source https://www.html.am/html-codes/character-codes/html-star-code.cfm -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review of {{ review.title }}</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            padding: 15px;
+            background-color: lightgray;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background-color: white;
+            padding: 15px;
+            border-radius: 3px;
+            box-shadow: 0 2px 4px gray;
+        }
+        h1 {
+            color: black;
+        }
+        .rating {
+            color: gold;
+            font-size: 20px;
+            margin: 8px 0;
+        }
+        .review-text {
+            margin: 15px 0;
+            line-height: 1.5;
+            font-size: 16px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: green;
+            color: white;
+            border-radius: 3px;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background-color: darkgreen;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ review.title }}</h1>
+        <div class="rating">
+            {% for i in range(0, review.rating) %}
+                ★
+            {% endfor %}
+            {% for i in range(0, 5-review.rating) %}
+                ☆
+            {% endfor %}
+        </div>
+        <div class="review-text">
+            {{ review.text }}
+        </div>
+        <a href="{{ url_for('show_all_reviews') }}" class="btn">Back to Reviews</a>
+    </div>
+</body>
+</html> 
