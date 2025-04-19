@@ -1,7 +1,8 @@
-from flask import Flask
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+# Source: https://www.geeksforgeeks.org/flask-url-helper-function-flask-url_for/
 
 # Initialize Flask App
 app = Flask(__name__)
@@ -87,13 +88,50 @@ def reset_db():
 
 # ROUTES
 """You will add all of your routes below, there is a sample one which you can use for testing"""
-
+# source: https://www.geeksforgeeks.org/flask-url-helper-function-flask-url_for/
 @app.route('/')
 def show_all_reviews():
-    return 'Welcome to Movie Theater reviews!'
+    reviews = db_manager.get()
+    return render_template("reviewslist.html", reviews=reviews)
 
+@app.route('/review/<int:review_id>')
+def show_review(review_id):
+    review = db_manager.get(review_id)
+    if review:
+        return render_template("review.html", review=review)
+    return redirect(url_for('show_all_reviews'))
   
-# RUN THE FLASK APP
+@app.route('/review/new', methods=['GET', 'POST'])
+def create_review():
+    if request.method == 'POST':
+        title = request.form['title']
+        text = request.form['text']
+        rating = int(request.form['rating'])
+        db_manager.create(title, text, rating)
+        return redirect(url_for('show_all_reviews'))
+    return render_template('review_form.html', review=None, action='Create')
+
+# https://www.geeksforgeeks.org/flask-http-methods-handle-get-post-requests/
+# 
+@app.route('/review/edit/<int:review_id>', methods=['GET', 'POST'])
+def edit_review(review_id):
+    review = db_manager.get(review_id)
+
+    if request.method == 'POST':
+        title = request.form['title']
+        text = request.form['text']
+        rating = int(request.form['rating'])
+        db_manager.update(review_id, title, text, rating)
+        return redirect(url_for('show_all_reviews'))
+    
+    return render_template('review_form.html', review=review, action='Edit')
+
+@app.route('/review/delete/<int:review_id>')
+def delete_review(review_id):
+    db_manager.delete(review_id)
+    return redirect(url_for('show_all_reviews'))
+
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()  # Ensure DB is created before running the app
